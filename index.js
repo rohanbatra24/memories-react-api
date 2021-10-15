@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 import postsRoutes from "./routes/posts.js";
 
@@ -12,8 +14,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
 app.use("/posts", postsRoutes);
 
-const CONNECTION_URL =
-  "mongodb+srv://rohanbatra:5AyDRqiz7E97heyR@cluster0.ybogw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const CONNECTION_URL = process.env.DB_CONNECTION_STRING;
 
 const PORT = process.env.PORT || 5000;
 
