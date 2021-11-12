@@ -12,7 +12,8 @@ export const signin = async (req, res) => {
       email,
     });
 
-    if (!existingUser) res.status(404).json({ message: "User not found" });
+    if (!existingUser)
+      return res.status(404).json({ message: "User not found" });
 
     const isPasswordCorrect = await bcrypt.compare(
       password,
@@ -20,7 +21,7 @@ export const signin = async (req, res) => {
     );
 
     if (!isPasswordCorrect)
-      res.status(400).json({ message: "Invalid Credentials" });
+      return res.status(400).json({ message: "Invalid Credentials" });
 
     const token = jwt.sign(
       { email: existingUser.email, id: existingUser._id },
@@ -28,23 +29,41 @@ export const signin = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ user: existingUser, token });
+    return res.status(200).json({ user: existingUser, token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
 export const signup = async (req, res) => {
+  console.log("1 :>> ", req.body);
+  const { email, password, confirmPassword, firstName, lastName } = req.body;
+
   try {
-    const user = await User.find({
-      username: req.body.username,
-      password: req.body.password,
+    const existingUser = await User.findOne({
+      email,
     });
 
-    console.log(`req`, req.body);
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
 
-    res.status(200).json(user);
+    if (password !== confirmPassword)
+      return res.status(400).json({ message: "Passwords don't match" });
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const result = await User.create({
+      email,
+      password: hashedPassword,
+      name: `${firstName} ${lastName}`,
+    });
+
+    const token = jwt.sign({ email: result.email, id: result._id }, "test", {
+      expiresIn: "1h",
+    });
+
+    return res.status(200).json({ result, token });
   } catch (error) {
-    res.status(500).send(error.message);
+    console.log("error :>> ", error);
   }
 };
