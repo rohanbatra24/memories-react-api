@@ -5,8 +5,6 @@ import mongoose from "mongoose";
 import User from "../models/user.js";
 
 export const signin = async (req, res) => {
-  console.log("1 :>> ", req.body);
-
   const { email, password } = req.body;
 
   try {
@@ -38,7 +36,6 @@ export const signin = async (req, res) => {
 };
 
 export const signup = async (req, res) => {
-  console.log("1 :>> ", req.body);
   const { email, password, confirmPassword, firstName, lastName } = req.body;
 
   try {
